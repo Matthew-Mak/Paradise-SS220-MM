@@ -83,10 +83,6 @@
 	return TRUE
 
 /obj/item/clothing/proc/remove_spy_spider()
-	set name = "Снять жучок"
-	set category = "Object"
-	set src in range(1, usr)
-
 	if(!ishuman(usr))
 		return
 	var/mob/living/carbon/human/user = usr
@@ -96,8 +92,6 @@
 			var/turf/user_loc = get_turf(user)
 			spy_spider_attached.forceMove(user_loc)
 		spy_spider_attached = null
-
-	verbs -= /obj/item/clothing/proc/remove_spy_spider
 
 /**
  * HUMAN PART
@@ -138,19 +132,15 @@
 // Spy spider detection
 /obj/item/detective_scanner/scan(atom/A, mob/user)
 	. = ..()
-	var/found_spy_device = FALSE
+
 	if(!scanning)
 		scanning = TRUE
 
-		if(istype(A, /obj/item/clothing))
-			var/obj/item/clothing/scanned_clothing = A
-			if(scanned_clothing.spy_spider_attached)
-				found_spy_device = TRUE
-
-		if(found_spy_device)
+	if(istype(A, /obj/item/clothing))
+		var/obj/item/clothing/scanned_clothing = A
+		if(scanned_clothing.spy_spider_attached)
 			sleep(1 SECONDS)
 			add_log(span_info("<B>Найдено шпионское устройство!</B>"))
-			if(!(/obj/item/clothing/proc/remove_spy_spider in A.verbs))
-				add_verb(A, /obj/item/clothing/proc/remove_spy_spider)
+			scanned_clothing.remove_spy_spider()
 
-		scanning = FALSE
+	scanning = FALSE
